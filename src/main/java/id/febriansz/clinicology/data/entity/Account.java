@@ -26,12 +26,10 @@ import javax.persistence.TemporalType;
 @Entity
 @Table(name = "account")
 @NamedQueries({
-    @NamedQuery(name = "Account.findAll", query = "SELECT a FROM Account a"),
-    @NamedQuery(name = "Account.findByUsername", query = "SELECT a FROM Account a WHERE a.username = :username"),
-    @NamedQuery(name = "Account.findByPassword", query = "SELECT a FROM Account a WHERE a.password = :password"),
-    @NamedQuery(name = "Account.findByName", query = "SELECT a FROM Account a WHERE a.name = :name"),
-    @NamedQuery(name = "Account.findByUpdatedAt", query = "SELECT a FROM Account a WHERE a.updatedAt = :updatedAt")})
+    @NamedQuery(name = "Account.findByUsername", query = "SELECT a FROM Account a WHERE a.username = :username")})
 public class Account implements Serializable {
+
+    public static final String PERSISTENCE = "Account";
 
     private static final long serialVersionUID = 1L;
     @Id

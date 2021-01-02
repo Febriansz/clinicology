@@ -65,20 +65,14 @@ public class Drug implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "drug")
+    private List<MedicalRecordReceipt> medicalRecordReceiptList;
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "drug")
-    private List<MedicalRecordReceipt> medicalRecordReceiptList;
-    @JoinColumn(name = "brand_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private DrugBrand brandId;
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private DrugCategory categoryId;
-    @JoinColumn(name = "class_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private DrugClass classId;
 
     public Drug() {
     }
@@ -175,28 +169,12 @@ public class Drug implements Serializable {
         this.medicalRecordReceiptList = medicalRecordReceiptList;
     }
 
-    public DrugBrand getBrandId() {
-        return brandId;
-    }
-
-    public void setBrandId(DrugBrand brandId) {
-        this.brandId = brandId;
-    }
-
     public DrugCategory getCategoryId() {
         return categoryId;
     }
 
     public void setCategoryId(DrugCategory categoryId) {
         this.categoryId = categoryId;
-    }
-
-    public DrugClass getClassId() {
-        return classId;
-    }
-
-    public void setClassId(DrugClass classId) {
-        this.classId = classId;
     }
 
     @Override

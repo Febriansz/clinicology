@@ -5,33 +5,49 @@
  */
 package id.febriansz.clinicology.ui;
 
-import id.febriansz.clinicology.BaseFrame;
+import id.febriansz.clinicology.Constant;
 import id.febriansz.clinicology.data.entity.Account;
 import id.febriansz.clinicology.utils.DialogUtils;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
+import javax.swing.AbstractAction;
 
 /**
  *
  * @author febriansz
  */
-public class LoginFrame extends BaseFrame implements ActionListener {
+public class LoginFrame extends javax.swing.JFrame {
 
-    private final EntityManagerFactory factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
+    private final EntityManagerFactory factory = Persistence.createEntityManagerFactory(Constant.PERSISTENCE_UNIT);
     private final EntityManager manager = factory.createEntityManager();
 
     public LoginFrame() {
         initComponents();
         initListener();
         reset();
+
+        setLocationRelativeTo(null);
     }
 
     private void initListener() {
-        btnLogin.addActionListener(this);
+        txtUsername.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                login();
+            }
+        });
+
+        txtPassword.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                login();
+            }
+        });
+
+        btnLogin.addActionListener((e) -> login());
     }
 
     private void enableControl(boolean enabled) {
@@ -49,7 +65,7 @@ public class LoginFrame extends BaseFrame implements ActionListener {
 
     private void login() {
         if (txtUsername.getText() == null || txtPassword.getPassword() == null) {
-            DialogUtils.ShowError("Form not completed yet");
+            DialogUtils.showError(this, "Form belum lengkap");
             return;
         }
 
@@ -57,39 +73,37 @@ public class LoginFrame extends BaseFrame implements ActionListener {
         String password = new String(txtPassword.getPassword());
 
         if (username.isBlank() || password.isBlank()) {
-            DialogUtils.ShowError("Form not completed yet");
+            DialogUtils.showError(this, "Form belum lengkap");
             return;
         }
 
         enableControl(false);
 
-        TypedQuery<Account> query = manager.createNamedQuery("Account.findByUsername", Account.class);
-        Account account = query.setParameter("username", username).getSingleResult();
+        try {
+            TypedQuery<Account> query = manager.createNamedQuery("Account.findByUsername", Account.class);
+            Account account = query.setParameter("username", username).getSingleResult();
 
-        if (account == null) {
-            DialogUtils.ShowError("Username not registered");
+            if (account == null) {
+                DialogUtils.showError(this, "Username tidak terdaftar");
+                reset();
+                return;
+            }
+
+            if (!account.getPassword().equals(password)) {
+                DialogUtils.showError(this, "Password salah, silahkan coba kembali");
+
+                enableControl(true);
+                txtPassword.setText("");
+                txtPassword.requestFocus();
+                return;
+            }
+
+            new DashboardFrame(account).setVisible(true);
+            this.dispose();
+        } catch (Exception e) {
+            DialogUtils.showError(this, "Username tidak terdaftar");
+            e.printStackTrace();
             reset();
-            return;
-        }
-
-        if (!account.getPassword().equals(password)) {
-            DialogUtils.ShowError("Incorrect Password");
-
-            enableControl(true);
-            txtPassword.setText("");
-            txtPassword.requestFocus();
-            return;
-        }
-
-        setAccount(account);
-        DialogUtils.ShowSuccess("Welcome " + account.getName());
-
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent evt) {
-        if (evt.getSource() == btnLogin) {
-            login();
         }
     }
 
@@ -122,7 +136,7 @@ public class LoginFrame extends BaseFrame implements ActionListener {
         panel1.setMaximumSize(new java.awt.Dimension(864, 554));
         panel1.setMinimumSize(new java.awt.Dimension(864, 554));
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/hospital.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/logo.png"))); // NOI18N
         jLabel1.setText("jLabel1");
         jLabel1.setMaximumSize(new java.awt.Dimension(64, 73));
         jLabel1.setMinimumSize(new java.awt.Dimension(64, 73));
@@ -150,19 +164,22 @@ public class LoginFrame extends BaseFrame implements ActionListener {
                 .addGap(29, 29, 29)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnLogin, javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(jLabel2)
+                        .addGap(138, 138, 138)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(138, 138, 138)
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(43, 43, 43))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel3)
-                            .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 395, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtPassword))
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(btnLogin))
+                            .addComponent(txtPassword, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtUsername, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 395, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, Short.MAX_VALUE)))
                         .addGap(40, 40, 40))))
         );
         jPanel1Layout.setVerticalGroup(
@@ -170,13 +187,13 @@ public class LoginFrame extends BaseFrame implements ActionListener {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(30, 30, 30)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGap(47, 47, 47)
-                        .addComponent(jLabel2)
-                        .addGap(44, 44, 44)
-                        .addComponent(jLabel3)))
+                        .addComponent(jLabel2))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(21, 21, 21)
+                .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -247,10 +264,8 @@ public class LoginFrame extends BaseFrame implements ActionListener {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new LoginFrame().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new LoginFrame().setVisible(true);
         });
     }
 

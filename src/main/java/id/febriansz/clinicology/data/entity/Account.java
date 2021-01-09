@@ -11,8 +11,6 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -46,9 +44,6 @@ public class Account implements Serializable {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
-    @JoinColumn(name = "clinic_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private ClinicProfile clinicId;
 
     public Account() {
     }
@@ -94,14 +89,6 @@ public class Account implements Serializable {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public ClinicProfile getClinicId() {
-        return clinicId;
-    }
-
-    public void setClinicId(ClinicProfile clinicId) {
-        this.clinicId = clinicId;
     }
 
     @Override

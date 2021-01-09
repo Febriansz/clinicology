@@ -5,6 +5,7 @@
  */
 package id.febriansz.clinicology.utils;
 
+import java.awt.Component;
 import javax.swing.JOptionPane;
 
 /**
@@ -13,12 +14,16 @@ import javax.swing.JOptionPane;
  */
 public class DialogUtils {
 
-    public static void ShowError(String message) {
-        JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+    public static void showSuccess(Component parent, String message) {
+        JOptionPane.showMessageDialog(parent, message, "Success", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public static void ShowSuccess(String message) {
-        JOptionPane.showMessageDialog(null, message, "Success", JOptionPane.INFORMATION_MESSAGE);
+    public static void showWarning(Component parent, String message) {
+        JOptionPane.showMessageDialog(parent, message, "Warning", JOptionPane.WARNING_MESSAGE);
+    }
+
+    public static void showError(Component parent, String message) {
+        JOptionPane.showMessageDialog(parent, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
 }

@@ -9,8 +9,10 @@ import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -27,15 +29,16 @@ import javax.persistence.TemporalType;
 @Table(name = "medical_record_receipt")
 @NamedQueries({
     @NamedQuery(name = "MedicalRecordReceipt.findAll", query = "SELECT m FROM MedicalRecordReceipt m"),
-    @NamedQuery(name = "MedicalRecordReceipt.findByRecordId", query = "SELECT m FROM MedicalRecordReceipt m WHERE m.medicalRecordReceiptPK.recordId = :recordId"),
-    @NamedQuery(name = "MedicalRecordReceipt.findByDrugId", query = "SELECT m FROM MedicalRecordReceipt m WHERE m.medicalRecordReceiptPK.drugId = :drugId"),
+    @NamedQuery(name = "MedicalRecordReceipt.findById", query = "SELECT m FROM MedicalRecordReceipt m WHERE m.id = :id"),
     @NamedQuery(name = "MedicalRecordReceipt.findByQuantity", query = "SELECT m FROM MedicalRecordReceipt m WHERE m.quantity = :quantity"),
     @NamedQuery(name = "MedicalRecordReceipt.findByUpdatedAt", query = "SELECT m FROM MedicalRecordReceipt m WHERE m.updatedAt = :updatedAt")})
 public class MedicalRecordReceipt implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @EmbeddedId
-    protected MedicalRecordReceiptPK medicalRecordReceiptPK;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
     @Basic(optional = false)
     @Column(name = "quantity")
     private short quantity;
@@ -43,36 +46,32 @@ public class MedicalRecordReceipt implements Serializable {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
-    @JoinColumn(name = "drug_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "drug_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private Drug drug;
-    @JoinColumn(name = "record_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private Drug drugId;
+    @JoinColumn(name = "record_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private MedicalRecord medicalRecord;
+    private MedicalRecord recordId;
 
     public MedicalRecordReceipt() {
     }
 
-    public MedicalRecordReceipt(MedicalRecordReceiptPK medicalRecordReceiptPK) {
-        this.medicalRecordReceiptPK = medicalRecordReceiptPK;
+    public MedicalRecordReceipt(Integer id) {
+        this.id = id;
     }
 
-    public MedicalRecordReceipt(MedicalRecordReceiptPK medicalRecordReceiptPK, short quantity, Date updatedAt) {
-        this.medicalRecordReceiptPK = medicalRecordReceiptPK;
+    public MedicalRecordReceipt(Integer id, short quantity, Date updatedAt) {
+        this.id = id;
         this.quantity = quantity;
         this.updatedAt = updatedAt;
     }
 
-    public MedicalRecordReceipt(String recordId, String drugId) {
-        this.medicalRecordReceiptPK = new MedicalRecordReceiptPK(recordId, drugId);
+    public Integer getId() {
+        return id;
     }
 
-    public MedicalRecordReceiptPK getMedicalRecordReceiptPK() {
-        return medicalRecordReceiptPK;
-    }
-
-    public void setMedicalRecordReceiptPK(MedicalRecordReceiptPK medicalRecordReceiptPK) {
-        this.medicalRecordReceiptPK = medicalRecordReceiptPK;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public short getQuantity() {
@@ -91,26 +90,26 @@ public class MedicalRecordReceipt implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    public Drug getDrug() {
-        return drug;
+    public Drug getDrugId() {
+        return drugId;
     }
 
-    public void setDrug(Drug drug) {
-        this.drug = drug;
+    public void setDrugId(Drug drugId) {
+        this.drugId = drugId;
     }
 
-    public MedicalRecord getMedicalRecord() {
-        return medicalRecord;
+    public MedicalRecord getRecordId() {
+        return recordId;
     }
 
-    public void setMedicalRecord(MedicalRecord medicalRecord) {
-        this.medicalRecord = medicalRecord;
+    public void setRecordId(MedicalRecord recordId) {
+        this.recordId = recordId;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (medicalRecordReceiptPK != null ? medicalRecordReceiptPK.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
@@ -121,7 +120,7 @@ public class MedicalRecordReceipt implements Serializable {
             return false;
         }
         MedicalRecordReceipt other = (MedicalRecordReceipt) object;
-        if ((this.medicalRecordReceiptPK == null && other.medicalRecordReceiptPK != null) || (this.medicalRecordReceiptPK != null && !this.medicalRecordReceiptPK.equals(other.medicalRecordReceiptPK))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -129,7 +128,12 @@ public class MedicalRecordReceipt implements Serializable {
 
     @Override
     public String toString() {
-        return "id.febriansz.clinicology.data.entity.MedicalRecordReceipt[ medicalRecordReceiptPK=" + medicalRecordReceiptPK + " ]";
+        return "id.febriansz.clinicology.data.entity.MedicalRecordReceipt[ id=" + id + " ]";
+    }
+
+    // custom class
+    public int getTotal() {
+        return quantity * drugId.getPrice();
     }
 
 }

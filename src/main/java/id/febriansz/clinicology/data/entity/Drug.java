@@ -6,15 +6,13 @@
 package id.febriansz.clinicology.data.entity;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -29,17 +27,12 @@ import javax.persistence.TemporalType;
 @Entity
 @Table(name = "drug")
 @NamedQueries({
-    @NamedQuery(name = "Drug.findAll", query = "SELECT d FROM Drug d"),
-    @NamedQuery(name = "Drug.findById", query = "SELECT d FROM Drug d WHERE d.id = :id"),
-    @NamedQuery(name = "Drug.findByName", query = "SELECT d FROM Drug d WHERE d.name = :name"),
-    @NamedQuery(name = "Drug.findByPurpose", query = "SELECT d FROM Drug d WHERE d.purpose = :purpose"),
-    @NamedQuery(name = "Drug.findBySideEffect", query = "SELECT d FROM Drug d WHERE d.sideEffect = :sideEffect"),
-    @NamedQuery(name = "Drug.findByUnit", query = "SELECT d FROM Drug d WHERE d.unit = :unit"),
-    @NamedQuery(name = "Drug.findByDosage", query = "SELECT d FROM Drug d WHERE d.dosage = :dosage"),
-    @NamedQuery(name = "Drug.findByPrice", query = "SELECT d FROM Drug d WHERE d.price = :price"),
-    @NamedQuery(name = "Drug.findByCreatedAt", query = "SELECT d FROM Drug d WHERE d.createdAt = :createdAt"),
-    @NamedQuery(name = "Drug.findByUpdatedAt", query = "SELECT d FROM Drug d WHERE d.updatedAt = :updatedAt")})
+    @NamedQuery(name = "Drug.finds", query = "SELECT d FROM Drug d ORDER BY d.name"),
+    @NamedQuery(name = "Drug.search", query = "SELECT d FROM Drug d WHERE d.id = :id OR d.name LIKE :name")})
 public class Drug implements Serializable {
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "drugId")
+    private Collection<MedicalRecordReceipt> medicalRecordReceiptCollection;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -50,14 +43,8 @@ public class Drug implements Serializable {
     @Column(name = "name")
     private String name;
     @Basic(optional = false)
-    @Column(name = "purpose")
-    private String purpose;
-    @Column(name = "side_effect")
-    private String sideEffect;
-    @Column(name = "unit")
-    private String unit;
-    @Column(name = "dosage")
-    private String dosage;
+    @Column(name = "category")
+    private String category;
     @Basic(optional = false)
     @Column(name = "price")
     private int price;
@@ -65,14 +52,9 @@ public class Drug implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "drug")
-    private List<MedicalRecordReceipt> medicalRecordReceiptList;
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
-    @JoinColumn(name = "category_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private DrugCategory categoryId;
 
     public Drug() {
     }
@@ -81,12 +63,11 @@ public class Drug implements Serializable {
         this.id = id;
     }
 
-    public Drug(String id, String name, String purpose, int price, Date createdAt) {
+    public Drug(String id, String name, String category, int price) {
         this.id = id;
         this.name = name;
-        this.purpose = purpose;
+        this.category = category;
         this.price = price;
-        this.createdAt = createdAt;
     }
 
     public String getId() {
@@ -105,36 +86,12 @@ public class Drug implements Serializable {
         this.name = name;
     }
 
-    public String getPurpose() {
-        return purpose;
+    public String getCategory() {
+        return category;
     }
 
-    public void setPurpose(String purpose) {
-        this.purpose = purpose;
-    }
-
-    public String getSideEffect() {
-        return sideEffect;
-    }
-
-    public void setSideEffect(String sideEffect) {
-        this.sideEffect = sideEffect;
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    public String getDosage() {
-        return dosage;
-    }
-
-    public void setDosage(String dosage) {
-        this.dosage = dosage;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public int getPrice() {
@@ -161,22 +118,6 @@ public class Drug implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    public List<MedicalRecordReceipt> getMedicalRecordReceiptList() {
-        return medicalRecordReceiptList;
-    }
-
-    public void setMedicalRecordReceiptList(List<MedicalRecordReceipt> medicalRecordReceiptList) {
-        this.medicalRecordReceiptList = medicalRecordReceiptList;
-    }
-
-    public DrugCategory getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(DrugCategory categoryId) {
-        this.categoryId = categoryId;
-    }
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -200,6 +141,14 @@ public class Drug implements Serializable {
     @Override
     public String toString() {
         return "id.febriansz.clinicology.data.entity.Drug[ id=" + id + " ]";
+    }
+
+    public Collection<MedicalRecordReceipt> getMedicalRecordReceiptCollection() {
+        return medicalRecordReceiptCollection;
+    }
+
+    public void setMedicalRecordReceiptCollection(Collection<MedicalRecordReceipt> medicalRecordReceiptCollection) {
+        this.medicalRecordReceiptCollection = medicalRecordReceiptCollection;
     }
 
 }

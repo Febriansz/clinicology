@@ -6,8 +6,8 @@
 package id.febriansz.clinicology.data.entity;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -27,18 +27,19 @@ import javax.persistence.TemporalType;
 @Entity
 @Table(name = "patient")
 @NamedQueries({
-    @NamedQuery(name = "Patient.findAll", query = "SELECT p FROM Patient p"),
-    @NamedQuery(name = "Patient.findById", query = "SELECT p FROM Patient p WHERE p.id = :id"),
-    @NamedQuery(name = "Patient.findByName", query = "SELECT p FROM Patient p WHERE p.name = :name"),
-    @NamedQuery(name = "Patient.findByPhoneCode", query = "SELECT p FROM Patient p WHERE p.phoneCode = :phoneCode"),
-    @NamedQuery(name = "Patient.findByPhoneNumber", query = "SELECT p FROM Patient p WHERE p.phoneNumber = :phoneNumber"),
-    @NamedQuery(name = "Patient.findByEmail", query = "SELECT p FROM Patient p WHERE p.email = :email"),
-    @NamedQuery(name = "Patient.findByGender", query = "SELECT p FROM Patient p WHERE p.gender = :gender"),
-    @NamedQuery(name = "Patient.findByBirthDate", query = "SELECT p FROM Patient p WHERE p.birthDate = :birthDate"),
-    @NamedQuery(name = "Patient.findByAddress", query = "SELECT p FROM Patient p WHERE p.address = :address"),
-    @NamedQuery(name = "Patient.findByCreatedAt", query = "SELECT p FROM Patient p WHERE p.createdAt = :createdAt"),
-    @NamedQuery(name = "Patient.findByUpdatedAt", query = "SELECT p FROM Patient p WHERE p.updatedAt = :updatedAt")})
+    @NamedQuery(name = "Patient.finds", query = "SELECT p FROM Patient p"),
+    @NamedQuery(name = "Patient.searchById", query = "SELECT p FROM Patient p WHERE p.id = :id OR p.cardId = :card_id"),
+    @NamedQuery(name = "Patient.search", query = "SELECT p FROM Patient p WHERE p.id = :id OR p.cardId = :card_id OR p.name LIKE :name")})
 public class Patient implements Serializable {
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "patientId")
+    private Collection<MedicalRecord> medicalRecordCollection;
+
+    public static class Gender {
+
+        public static final String MALE = "M";
+        public static final String FEMALE = "F";
+    }
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -46,35 +47,30 @@ public class Patient implements Serializable {
     @Column(name = "id")
     private String id;
     @Basic(optional = false)
+    @Column(name = "card_id")
+    private String cardId;
+    @Basic(optional = false)
     @Column(name = "name")
     private String name;
     @Basic(optional = false)
-    @Column(name = "phone_code")
-    private String phoneCode;
-    @Basic(optional = false)
-    @Column(name = "phone_number")
-    private String phoneNumber;
-    @Column(name = "email")
-    private String email;
-    @Basic(optional = false)
     @Column(name = "gender")
-    private Character gender;
+    private String gender;
     @Basic(optional = false)
     @Column(name = "birth_date")
     @Temporal(TemporalType.DATE)
     private Date birthDate;
     @Basic(optional = false)
+    @Column(name = "phone_number")
+    private String phoneNumber;
+    @Basic(optional = false)
     @Column(name = "address")
     private String address;
-    @Basic(optional = false)
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "patientId")
-    private List<MedicalRecord> medicalRecordList;
 
     public Patient() {
     }
@@ -83,13 +79,13 @@ public class Patient implements Serializable {
         this.id = id;
     }
 
-    public Patient(String id, String name, String phoneCode, String phoneNumber, Character gender, Date birthDate, String address, Date createdAt) {
+    public Patient(String id, String cardId, String name, String gender, Date birthDate, String phoneNumber, String address, Date createdAt) {
         this.id = id;
+        this.cardId = cardId;
         this.name = name;
-        this.phoneCode = phoneCode;
-        this.phoneNumber = phoneNumber;
         this.gender = gender;
         this.birthDate = birthDate;
+        this.phoneNumber = phoneNumber;
         this.address = address;
         this.createdAt = createdAt;
     }
@@ -102,6 +98,14 @@ public class Patient implements Serializable {
         this.id = id;
     }
 
+    public String getCardId() {
+        return cardId;
+    }
+
+    public void setCardId(String cardId) {
+        this.cardId = cardId;
+    }
+
     public String getName() {
         return name;
     }
@@ -110,35 +114,11 @@ public class Patient implements Serializable {
         this.name = name;
     }
 
-    public String getPhoneCode() {
-        return phoneCode;
-    }
-
-    public void setPhoneCode(String phoneCode) {
-        this.phoneCode = phoneCode;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Character getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Character gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
@@ -148,6 +128,14 @@ public class Patient implements Serializable {
 
     public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getAddress() {
@@ -174,14 +162,6 @@ public class Patient implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    public List<MedicalRecord> getMedicalRecordList() {
-        return medicalRecordList;
-    }
-
-    public void setMedicalRecordList(List<MedicalRecord> medicalRecordList) {
-        this.medicalRecordList = medicalRecordList;
-    }
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -205,6 +185,14 @@ public class Patient implements Serializable {
     @Override
     public String toString() {
         return "id.febriansz.clinicology.data.entity.Patient[ id=" + id + " ]";
+    }
+
+    public Collection<MedicalRecord> getMedicalRecordCollection() {
+        return medicalRecordCollection;
+    }
+
+    public void setMedicalRecordCollection(Collection<MedicalRecord> medicalRecordCollection) {
+        this.medicalRecordCollection = medicalRecordCollection;
     }
 
 }

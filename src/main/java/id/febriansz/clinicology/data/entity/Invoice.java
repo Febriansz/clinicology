@@ -144,4 +144,13 @@ public class Invoice implements Serializable {
         return "id.febriansz.clinicology.data.entity.Invoice[ id=" + id + " ]";
     }
 
+    // custom method
+    public int getTotalCost() {
+        return actionCost + drugsCost;
+    }
+
+    public void addDrugsCost(int drugsCost) {
+        this.drugsCost += drugsCost;
+    }
+
 }
